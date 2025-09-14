@@ -30,10 +30,10 @@ def detect_colors(frame, color_ranges):
                 text_y = y - 10 if y - 10 > 20 else y + 20
                 cv2.putText(result, color_name, (x, text_y),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-    return result
+    return result, masks
 
 # ---------------- Streamlit App ----------------
-st.title("🎨 Color Detection App")
+st.title("🎨 Color Detection App with Debug Tools")
 
 # Define HSV color ranges
 color_ranges = [
@@ -55,9 +55,24 @@ if uploaded_file is not None:
     frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
     # Detect colors
-    output = detect_colors(frame, color_ranges)
+    output, masks = detect_colors(frame, color_ranges)
 
     # Convert back to RGB for Streamlit
     output_rgb = cv2.cvtColor(output, cv2.COLOR_BGR2RGB)
 
     st.image(output_rgb, caption="Detected Colors", use_column_width=True)
+
+    # ✅ Debug Options
+    st.subheader("🛠️ Debug Tools")
+    show_debug = st.checkbox("Show Debug Information")
+    show_masks = st.checkbox("Visualize HSV Masks")
+
+    if show_debug:
+        st.text("Frame shape: {}".format(frame.shape))
+        avg_hsv = np.mean(cv2.cvtColor(frame, cv2.COLOR_BGR2HSV), axis=(0, 1)).astype(int)
+        st.text(f"Average HSV of Image: {avg_hsv}")
+
+    if show_masks:
+        st.subheader("🎭 HSV Masks")
+        for mask, name in masks:
+            st.image(mask, caption=f"Mask for {name}", use_column_width=True)

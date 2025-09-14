@@ -4,3 +4,8 @@ numpy
 pandas
 Pillow
 streamlit-image-coordinates
+pyttsx3
+gTTS
+playsound
+scikit-learn
+tensorflow
